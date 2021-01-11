@@ -101,6 +101,151 @@ cor.test(x,y2,method="kendall")
 
 
 
+################################################################################
+######################### PROBABILITY DESTTRIBUTIONS ###########################
+################################################################################
+
+# the probability of a possible outcome (value)
+
+# Normal
+dnrom()
+
+# Poisson distribution
+# Positive integers (discreet, so not continuous)
+dpois()
+
+# Gamma Distribution
+# Positive and continuous
+
+
+# Chi Square
+dchisq(18.3,10) # density statistical probability at specific point (18.3 in this case, 10 is degrees of freedom). This is the p-value
+pchisq(18.3,10) # integral of probability, or sum up to that point
+
+require(sjPlot)
+dist_chisq(deg.f=10)
+
+############# DATA EXPLORATION
+summary(x2)
+
+require(pastecs)
+stat.desc(x2) # great for checking completeness of data, namely missing values
+
+require(psych)
+describe(x2)
+
+head(airquality)
+summary(airquality)
+
+# correlation between several vars
+pairs(na.omit(airquality[1:4]), panel = function(x, y) {
+    points(x, y)
+    lines(lowess(x, y), lwd = 2, col = "red")
+    })
+
+
+# histograms
+par(mfrow=c(2,2))
+hist(airquality$Ozone)
+hist(airquality$Solar.R)
+hist(airquality$Wind)
+hist(airquality$Temp)
+
+# log does not make vars more normal in general, makes SOME. Other could do with dif. transformation
+par(mfrow=c(2,2))
+hist(log(airquality$Ozone))
+hist(log(airquality$Solar.R))
+hist(log(airquality$Wind))
+hist(log(airquality$Temp))
+
+# check summary per months
+tapply(airquality$Ozone,airquality$Month,summary)
+
+
+
+par(mfrow=c(2,2))
+boxplot(airquality$Ozone~airquality$Month)
+boxplot(airquality$Solar.R~airquality$Month)
+boxplot(airquality$Wind~airquality$Month)
+boxplot(airquality$Temp~airquality$Month)
+
+
+
+require(ggplot2)
+airquality$Month<-as.factor(airquality$Month)
+ggplot(airquality,aes(x=Month,y=Ozone,fill=Month)) +
+    geom_violin()
+
+
+
+
+# In the file Cholesterol.csv, we have the measurements of Cholesterol in blood in
+# a number of patients. It was recorded as well the age, the gender and the physical
+# condition (attributed to 4 different categories) of the patients. Calculate the descriptive
+# statistics that you consider appropriate for these data and perform basic plots
+# to have a look at the relationships and distributions of the variables.
+
+data <- read.csv2("Cholesterol.csv")
+str(data)
+summary(data)
+
+# Cholesterol
+mean(data$Chol.Blood)
+median(data$Chol.Blood)
+sd(data$Chol.Blood)
+
+
+
+
+# Gender
+plot(as.factor(data$Gender), data$Chol.Blood)
+female <- data[data$Gender == "F", ]
+male <- data[data$Gender == "M", ]
+mean_female <- mean(female$Chol.Blood)
+mean_female
+mean_male <- mean(male$Chol.Blood)
+mean_male
+
+# Hospital
+plot(as.factor(data$Hospital), data$Chol.Blood)
+
+# Physical Condition
+plot(as.factor(data$Physical.condition), data$Chol.Blood)
+
+
+# Gender
+rl <- lm(data = data, Chol.Blood ~ Age)
+plot(data$Age, data$Chol.Blood)
+abline(rl[[1]][1], rl[[1]][2], col = 'red')
+abline(rl, col = 'red')
+
+library(car)
+outlierTest(rl) # not data outliers, but outliers on the model!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+library(dplyr)
+by_hosp <- data %>%
+            group_by(Hospital) %>%
+            summarise(n = n(),
+                      mean_chol = mean(Chol.Blood),
+                      sd_chol = sd(Chol.Blood),
+                      mean_age = mean(Age),
+                      sd_age = sd(Age))
+
+by_hosp
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
