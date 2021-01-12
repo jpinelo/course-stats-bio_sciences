@@ -62,7 +62,7 @@ IQR(a)
 
 # PARAMETRIC VS NON-PARAMETRIC
 
-# PARAMETRIC ASSUMES DATA FOLLOW A DISTRIBUTION (usually normal)
+# PARAMETRIC ASSUMES DATA FOLLOWS A DISTRIBUTION (usually normal)
 
 # Perason's corr coef. - Parametric
 # only for nomral distrib AND linear dependence 
