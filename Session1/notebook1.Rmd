@@ -5,8 +5,8 @@ output: html_notebook
 
 ###### Course **CIIMAR**
 ###### Lecturer **Aldo Felpeto**
-###### 11-14 Jan 2021
-
+###### 11-14 Jan 2021   
+### **11 Jan - Session 1**
 
 # DESCRIPTIVE STATISTICS   
 
