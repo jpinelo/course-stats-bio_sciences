@@ -3,168 +3,378 @@ title: "Introduction to Statistics for Biosciencies"
 output: html_notebook
 ---
 
+###### Course **CIIMAR**
+###### Lecturer **Aldo Felpeto**
+###### 11-14 Jan 2021
 
 
-
-
-
+# DESCRIPTIVE STATISTICS   
 
 ```{r}
-
+x <- c(3,6,7,4,3,2,5,4,3,3,7,8,3)
 ```
 
-### 
-
 ```{r}
-
+library("modeest")
+mlv(x, method = "mfv")
 ```
 
-
-
-### 
-
 ```{r}
-
+hist(x)
 ```
 
-
-### 
-
 ```{r}
-
+x2 <- rnorm(50)
+x2
 ```
 
-
-### 
-
 ```{r}
-
+plot(x2)
+```
+```{r}
+hist(x2)
 ```
 
-
-### 
+### MEASURES OF CENTRAL TENDENCY
 
 ```{r}
-
+mlv(x2,method="naive",bw=1/3) # finds interval with more observations (and considers the middle point as the mode)
+```
+```{r}
+mlv(x2,method="parzen",kernel="gaussian")
 ```
 
-
-### 
-
+#### Median
+Not sensitive to outliers
 ```{r}
-
+x3<-c(3,6,NA,7,4,3,2,5,4,3,NA,3,7,8,3)
+median(x3,na.rm=TRUE) # NOT sensitive to outliers
 ```
 
 
-### 
+#### Arithmetic Mean
+```{r}
+mean(x3, na.rm=TRUE) # sensitive to outliers
+```
 
 ```{r}
+mean(x2,na.rm=TRUE,trimm=0.1) # truncated mean (trimming data) remove outliers- here removing 0.1 or 10% from each tail of the distribution
+```
 
+### Means for vars that by nature are not additive or linear, but multiplicative, exponential or logarithmic
+
+#### Geometric Mean   
+Geometric mean good for rates of change
+```{r}
+library(psych)
+geometric.mean(x3)
+```
+
+#### Harmonic Mean   
+For ranges with high magnitudes (not for rates of change) 
+```{r}
+library(psych)
+harmonic.mean(x3)
+```
+
+### MEASURES OF DISPERSION   
+```{r}
+z <- rnorm(13)
+z
+```
+
+#### Variance    
+Variance (squared values of vars) (since square no negative values) (so used in models)
+```{r}
+var(z) # 
+```
+
+#### Standard Deviation   
+Square root of variance (dispersion in same scale of vars) (better than var() to describe the data so easier to interpret)
+```{r}
+sd(z)
+```
+sd for data n < 13 sd should be calculated dividing by n-1 bather than dividing by n.
+
+
+*Never use **Standard Error** *to describe data. It is useful for estimation of parameters. So for inferential, not descriptive stats.*     
+
+
+#### Coefficient of Variation   
+Useful to compare vars which have different scales.
+Divide standard deviation by the mean: cv = sd/mean
+```{r}
+cv <- sd(z)/mean(z)
+cv
+```
+
+#### Interquartile Range
+```{r}
+a <- rnorm(100)
+a
+```
+
+```{r}
+IQR(a)
+```
+
+### MEASURES OF ASSOCIATION   
+Measure the variance of the level of association between variables.   
+
+#### Correlation Coefficient   
+**Parametric Vs Non-Parametric**   
+
+### Parametric   
+Assumes that the data follows certain parameters:   
+ - data follows a specific type of distribution (Gaussian, Poisson, Gamma, etc.)   
+
+#### Perason's Correlation Coefficient (Parametric)   
+Assumptions:   
+- data is normally distributed;   
+- there is a linear dependence.   
+
+
+
+### Non-Parametric    
+No assumptions of normality or linearity.   
+One assumption:   
+ - Data is **monotonic** (always increase or decrease)   
+Used for ranked data.   
+
+#### Spearman's
+For ranked data. Can also be used for ordinal variables but only with large data sets.  
+
+
+#### Kendal   
+For ordinal variables with small data sets.      
+
+
+##### Compare Coefficients   
+```{r}
+x<-rnorm(30)
+x
+```
+```{r}
+y1 <- (0.7*x+0.3)+rnorm(30,0,0.25) # rnorm() to add noise
+y1
+```
+
+```{r}
+plot(x,y1)
+```
+###### Sigmoid function   
+```{r}
+y2<-(1/(1+exp(-2.5*x)))+rnorm(30,0,0.05)
+y2
+```
+
+```{r}
+plot(x, y2)
+```
+
+#### Good data for pearson   
+```{r}
+cor.test(x,y1,method="pearson") 
+```
+```{r}
+cor.test(x,y1,method="spearman")
+```
+```{r}
+cor.test(x,y1,method="kendall")
+```
+
+#### Good data for Spearman's
+```{r}
+cor.test(x,y2,method="pearson") # good data for spearman
+```
+```{r}
+cor.test(x,y2,method="spearman")
+```
+```{r}
+cor.test(x,y2,method="kendall")
 ```
 
 
-### 
+
+
+# PROBABILITY DESTTRIBUTIONS    
+The probability of a possible outcome (value)
+
+### Gaussian (Normal)   
+dnrom(x)
+
+### Poisson distribution   
+Positive integers (discreet, so not continuous)   
+dpois(x)    
+
+### Gamma Distribution   
+Always positive and continuous   
+
+
+### Chi Square   
+`r dchisq(18.3,10)` 
+Functions that start with **d** (density): Statistical probability at specific point (18.3 in this case, 10 is degrees of freedom). This is the p-value
+
+`r pchisq(18.3,10)` 
+Functions that start with **p** (probability): Integral of probability, or sum up to that point
 
 ```{r}
+library(sjPlot)
+dist_chisq(deg.f=10)
+```
 
+# DATA EXPLORATION   
+```{r}
+summary(x2)
 ```
 
 
-### 
+#### Helping functions for checking for completeness of data, namely missing values   
+```{r}
+library(pastecs)
+stat.desc(x2) 
+```
 
 ```{r}
+require(psych)
+describe(x2)
+```
 
+```{r}
+head(airquality)
+```
+```{r}
+summary(airquality)
+```
+
+#### Correlation between several vars
+```{r}
+pairs(na.omit(airquality[1:4]), panel = function(x, y) {
+    points(x, y)
+    lines(lowess(x, y), lwd = 2, col = "red")
+    })
+```
+
+#### histograms
+```{r}
+par(mfrow=c(2,2))
+hist(airquality$Ozone)
+hist(airquality$Solar.R)
+hist(airquality$Wind)
+hist(airquality$Temp)
+```
+
+*log does not make vars more normal in general, makes SOME. Other could do with dif. transformation*   
+
+```{r}
+par(mfrow=c(2,2))
+hist(log(airquality$Ozone))
+hist(log(airquality$Solar.R))
+hist(log(airquality$Wind))
+hist(log(airquality$Temp))
 ```
 
 
-### 
+#### Summary per var (months)      
+```{r}
+tapply(airquality$Ozone,airquality$Month,summary)
+```
 
 ```{r}
+par(mfrow=c(2,2))
+boxplot(airquality$Ozone~airquality$Month)
+boxplot(airquality$Solar.R~airquality$Month)
+boxplot(airquality$Wind~airquality$Month)
+boxplot(airquality$Temp~airquality$Month)
+```
 
+```{r}
+library(ggplot2)
+airquality$Month<-as.factor(airquality$Month)
+ggplot(airquality,aes(x=Month,y=Ozone,fill=Month)) +
+    geom_violin()
+```
+
+
+# EXERCISE 1
+In the file Cholesterol.csv, we have the measurements of Cholesterol in blood in a number of patients. It was recorded as well the age, the gender and the physical
+condition (attributed to 4 different categories) of the patients. Calculate the descriptive statistics that you consider appropriate for these data and perform basic
+plots to have a look at the relationships and distributions of the variables.
+
+```{r}
+data <- read.csv2("Cholesterol.csv")
+str(data)
+```
+```{r}
+summary(data)
+```
+
+### Cholesterol
+```{r}
+mean(data$Chol.Blood)
+```
+```{r}
+median(data$Chol.Blood)
+```
+```{r}
+sd(data$Chol.Blood)
 ```
 
 
 
-### 
-
+### Gender   
 ```{r}
-
+plot(as.factor(data$Gender), data$Chol.Blood)
 ```
 
-
-### 
-
 ```{r}
-
+female <- data[data$Gender == "F", ]
+male <- data[data$Gender == "M", ]
+```
+```{r}
+mean_female <- mean(female$Chol.Blood)
+mean_female
+```
+```{r}
+mean_male <- mean(male$Chol.Blood)
+mean_male
+```
+### Hospital
+```{r}
+plot(as.factor(data$Hospital), data$Chol.Blood)
 ```
 
-
-### 
-
 ```{r}
+library(dplyr)
+by_hosp <- data %>%
+            group_by(Hospital) %>%
+            summarise(n = n(),
+                      mean_chol = mean(Chol.Blood),
+                      sd_chol = sd(Chol.Blood),
+                      mean_age = mean(Age),
+                      sd_age = sd(Age))
 
+by_hosp
 ```
 
-
-### 
-
+### Physical Condition
 ```{r}
-
+plot(as.factor(data$Physical.condition), data$Chol.Blood)
 ```
 
-
-### 
-
+### Gender
 ```{r}
-
+rl <- lm(data = data, Chol.Blood ~ Age)
+plot(data$Age, data$Chol.Blood)
+# abline(rl[[1]][1], rl[[1]][2], col = 'red')
+abline(rl, col = 'red')
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+##### Check for Outliers on the Model
+```{r}
+library(car)
+outlierTest(rl)
+```
 
 
 
