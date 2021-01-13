@@ -53,7 +53,9 @@ To create a model we use `lm()`, which takes the dependent and independent varia
 `lm(data= data, dependent_var~independent_var)` OR `lm(data$dependent_var~data$independent_var)`   
 The formulation can be read as:      
 
-> *Dependent variable* **as predicted by** *Independent variable*   
+> *Dependent variable* **as predicted by** *the Independent variable*   
+
+> *Dependent variable* **as a function of** *the Independent variable*   
 
 ####     
 ```{r}
@@ -68,13 +70,48 @@ summary(model)
 ````
 
 ##### Interpreting the model:   
+**Residuals**   
+* Residual - the median shall be approx. 0. because on a normal distrib. the mean/median is 0, and the quartiles shalll be simmilar.
+Most importantly the **Coefficients**:
+* Pr is the p value for the t student's test   
+These tests are against 0 because if the parameter was 0 it would not be useful for the model. In this case parameters are significantly diff from 0.   
+**Residual Standar Error**   
 * The residual standard error is the value that is minimized by iteration   
 * The residual standard error is not the sum of the residuals, that, is always = 0   
 * This residual standard error is interpreted as the unexplained variance   
 * Because the residual standard error is calculated as the sum of all the squared differences between a real value and the expected theoretical value (remember the formula of the variance), it is essentially the same thing.
 * Regarding degrees of freedom, they have interpretations expressed in a different way, depending if we are in a context of physics or statistics, but in essence, they are equivalent.   
+**F Statistic** (refers to the whole model)     
+* For large n this tends to be significant, so be careful with interpreting it. So it basically says whether there is enough data in the model. Not the performance of the model (how much is explained by it).       
+**Degrees of Freedom** (DF) in general       
+* they are ;ike dimension, or vars with which the model can play to find best fit
+* Nomarally = n-1   
+**Degrees of Freedom** (DF) interpreting in the summary of the model   
+= n - 2   (We could say that we have 149 (150 data – 1) degrees of freedom for the error and 1 degree of freedom for the model (2 parameters – 1). The total degrees of freedom are hence 148)     
+**Multiple R-squared** (refers to whole model)   
+* Coeficient of determination (this is not pearson corr. coef.) _ gives the percentage of variance of data explained by the model. In this case the model explains 93% of the varience. This is only valid for linear regressions.
+**Adjusted R-squared** (refers to whole model)    
+Gives the percentage of variance of data explained by the model. It if useful for multiple regression. When the model has several variables, it is usually better, but might not be proportional to the use of so many variables. The model might be apparently better spuriously. So this is a **penalized R-squared** for using many vars, which should increase the quality of the model significantly but might not.   
+We look for the mix of vars that minimizes the difference between Multiple and Adjusted-R-squared values. There are functions to do this automatically.    
 
-####     
+
+#### Assumptions of Linear Regression:   
+* Linear relationship   
+* Residuals should be independent
+* Residuals shall be normal   
+
+
+### complete...
+
+
+
+
+
+
+### Testing for the assumptions
+
+for n > 1000 just check visually for normallity since the tests are not reliable   
+
 ```{r}
 
 ````
@@ -86,9 +123,46 @@ summary(model)
 
 
 
+
+
+
+
+![Ideally, the ted line should be horizontal.](spread-level.png)  
+Ideally, the red line should be horizontal, flat. That will mean that residuals ar constant and residuals are normal.    
+not  flat red line means that residuals are auto-correlated  
+Means residuals are increasing and they should be +- constant    
+If residuals show a trend, such as here, it means that there is a var that is explaining it, which we should include. In this example, including the species could solve some of it. However this is a qualitative var so another model is needed.    
+
+
+
+### To transform one var, we should no assume that log will do it.
+`boxcox()` finds the optimal lambda for the normality of our data (the residuals of the model), or the optimal transformation function. If we have a good normal, it is very likely that other parameters are also resolved.
+* Transform the variable then redo the model with transformed var.     
+
+#### Nother option for trnaforming   
+Here applies to the variable   
+`require(bestNormalize)`
+`bestNormalize(iris$Petal.Width)`    
+choose the transformation based on output of above (look for lower value)
+transform then redo model
+(to transform use a function that has the exact name of the transform chosen on the output of the `bestNormalize()` )
 
 
 ## NON-LINEAR REGRESSION
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
