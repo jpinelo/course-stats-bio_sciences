@@ -21,16 +21,19 @@ Linear model:
 
 Where:   
 * a = slope   
-* b = intercept   
+* b = intercept   (value of response when predictor is 0 - so a sort of starting reference)
 
 Fitting the model to the data consists in finding the best estimates for a and b.         
 Finding the estimates can be done through several methods. Here we use the **Minimization of the Residual Square Sum**.      
 
 #### Minimization of the Residual Square Sum   
-Residuals are the magnitude of the vector between each real point to the model fitted (vertical straight line between each point and the model).
+* Residuals are the magnitude of the vector between each real point to the model fitted (vertical straight line between each point and the model).
+* The residual variance is what is left; what cannot be explained by the model.   
+
 Residuals are represented by the dashed lines in the figure below.   
 ![Illustration of the residuals as dashed lines.](residuals.png)    
-
+The minimized value is found by **iterating** a matrix algorithm that calculates the residuals for different fitted values of y calculated from iterated values of the two parameters of the linear function (a and b).   
+An important property of the residuals is that their **sum is always equal to 0**.   
 
 
 #### Example of Linear Fit, or Linear Regression        
@@ -63,6 +66,13 @@ The formulation above means: *Petal width predicted by petal length*
 ```{r}
 summary(model)
 ````
+
+##### Interpreting the model:   
+* The residual standard error is the value that is minimized by iteration   
+* The residual standard error is not the sum of the residuals, that, is always = 0   
+* This residual standard error is interpreted as the unexplained variance   
+* Because the residual standard error is calculated as the sum of all the squared differences between a real value and the expected theoretical value (remember the formula of the variance), it is essentially the same thing.
+* Regarding degrees of freedom, they have interpretations expressed in a different way, depending if we are in a context of physics or statistics, but in essence, they are equivalent.   
 
 ####     
 ```{r}
@@ -121,7 +131,7 @@ summary(model)
 
 
 ## NON-PARAMETRIC REGRESSION
-
+The tern non-parametric is used differently then when used in the contsxt of testing for meand or variance
 
 
 
