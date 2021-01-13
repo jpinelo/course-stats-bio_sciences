@@ -10,7 +10,78 @@ output: html_notebook
 ### **13 Jan - Session 3**
 
 
-# LINEAR REGRESSION
+## LINEAR REGRESSION
+
+* **Independent** variable = **Predictor** (traditionally denoted x and plotted on this axis)   
+* **Dependent** variable = **Response** (y)   
+
+Linear model:    
+
+> *y = ax +b*   
+
+Where:   
+* a = slope   
+* b = intercept   
+
+Fitting the model to the data consists in finding the best estimates for a and b.         
+Finding the estimates can be done through several methods. Here we use the **Minimization of the Residual Square Sum**.      
+
+#### Minimization of the Residual Square Sum   
+Residuals are the magnitude of the vector between each real point to the model fitted (vertical straight line between each point and the model).
+Residuals are represented by the dashed lines in the figure below.   
+![Illustration of the residuals as dashed lines.](residuals.png)    
+
+
+
+#### Example of Linear Fit, or Linear Regression        
+```{r}
+data(iris)
+str(iris)
+```
+
+
+#### Look at all pairwise combinations        
+```{r}
+pairs(iris[,-5], lower.panel=NULL, col=as.numeric(iris$Species))
+````
+In this example, it looks like petal length and petal with have a strong and **linear** association.
+
+To create a model we use `lm()`, which takes the dependent and independent variables.   
+`lm(data= data, dependent_var~independent_var)` OR `lm(data$dependent_var~data$independent_var)`   
+The formulation can be read as:      
+
+> *Dependent variable* **as predicted by** *Independent variable*   
+
+####     
+```{r}
+model <- lm(data= iris, Petal.Width~Petal.Length)
+````
+The formulation above means: *Petal width predicted by petal length*
+
+
+###### See model data        
+```{r}
+summary(model)
+````
+
+####     
+```{r}
+
+````
+
+####     
+```{r}
+
+````
+
+
+
+
+
+## NON-LINEAR REGRESSION
+
+
+
 
 
 
@@ -49,50 +120,7 @@ output: html_notebook
 
 
 
-
-# NON-LINEAR REGRESSION
-
-
-
-
-
-
-
-
-####     
-```{r}
-
-````
-
-####     
-```{r}
-
-````
-
-####     
-```{r}
-
-````
-
-####     
-```{r}
-
-````
-
-####     
-```{r}
-
-````
-
-####     
-```{r}
-
-````
-
-
-
-
-# NON-PARAMETRIC REGRESSION
+## NON-PARAMETRIC REGRESSION
 
 
 
