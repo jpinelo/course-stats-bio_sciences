@@ -261,6 +261,7 @@ Anova(model1)
 ```
 The interactions are not significant.    
 
+So now with the '+' we indicate that we don't want interactions.   
 ```{r}
 model1.2 <- lm(data = data, Chol.Blood~Gender+Physical.condition+Age)
 ```
@@ -306,30 +307,47 @@ Note that Var Hospital is nested in var Districts.
 ```{r}
 library(lme4)
 model2 <- lmer(Chol.Blood ~ Gender + Physical.condition + (1 | Hospital), data = data)
-model3 <- lmer(Chol.Blood ~ Gender + Physical.condition + (1 | District), data = data)
+model3 <- lmer(Chol.Blood ~ Gender + Physical.condition + (1 | District/Hospital), data = data)
 ```
 
 
-WHich model performs better?    
+```{r}
+summary(model2)
+```
+
+```{r}
+summary(model3)
+```
+not a good model.
+
+
+Which model performs better?    
 ```{r}
 AIC(model1.2,model2,model3)
-
 ```
+better models 2 and 3 are better, but mod 3 just slightly better than 2 and has 1 less df, so the best model is 2.   
 
 
 
 ```{r}
+Anova(model2)
+```
 
 
+```{r}
+Anova(model3)
+```
 
+```{r}
+library(multcomp)
+summary(glht(model2, linfct = mcp(Physical.condition = "Tukey")))
+```
 
-
-
-
-
-
-
-
+All pairwise interactions are significant      
+the nulll hyp says there is no sig diff. the estimate is the real dif.   
+line 1 -> dif is positive so A largen than B   
+z values is essentially students t test      
+Pr is the p value, adjusted (with simple-step) for the multiple comparisons.   
 
 
 
