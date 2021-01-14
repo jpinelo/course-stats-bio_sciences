@@ -363,16 +363,8 @@ summary(model2)
 ```{r}
 monod <- curve((0.68 * x)/(2.37 + x),from = 0, to = 350)
 plot(data1$NO2, data$r)
-points(monod, type = "l", lty = 2)
+#points(monod, type = "l", lty = 2)
 ```
-
-```{r}
-
-
-```
-
-
-
 
 
 
