@@ -1,0 +1,308 @@
+---
+title: "Introduction to Statistics for Biosciencies"
+output: html_notebook
+---
+
+
+###### Course **CIIMAR**
+###### Lecturer **Aldo Felpeto**
+###### 11-14 Jan 2021   
+### **14 Jan - Session 4**
+
+
+# The Analysis of Variance in the Framework of General Linear Models (GLM)   
+
+GLM is a framework for the statistical analysis and inference for the study of linear relationships between a response variable and one or several predictor variables.      
+
+GLM is a generalization of simple and multiple linear regression that incorporates categorical variables (factors) and complex designs such as nested,designs, random factors, etc. and inferential techniques such as the analysis of variance. 
+
+* Response or dependent var   
+* Predictor or independent var   
+
+Starting point is the sample of individuals with one measurable property - the dependent variable (response).   
+The objective is to predict the values of that response property from a linear combination of other (independent) variables.   
+* Independent variables can be qualitative (factors) or quantitative (numeric/time).   
+* The effect of the variables is always additive.(they cannot interact with other independent variables)                
+
+#### Assumptions   
+* Linear relationship (or linearizable)   
+* Independence of predictor variables. This can be tested with a correlation matrix or with the VIF (variance inflation factor).
+* Independence or no autocorrelation of the values of the response variable 
+* Normal distribution of residual error
+* Homogeneity of variances. The homogeneity has to be between groups of factor levels, it is related with the normality of the errors.   
+
+#### Steps
+1. Fit of the linear model: this is analogous to a linear regression fit. The values of the ßi coefficient from the equation above are obtained, and a t-test will tell us if these coefficients are significantly different of 0.     
+2. Perform an Analysis of variance (ANOVA) in order to test for the effects of the independent variables, so called ‘main effects’. The Fischer-Snedecor F contrast statistic is calculated as a ratio of variances. It can be used to test for differences between variances, but also for other purposes, we already saw it in session 3 employed to assess the overall significance of a model fit. And it can also be used to test for differences between means. This is how it is employed in the Analysis of Variance to test for the main effects. In order to understand how it works, we need to understand the general formulation of this contrast statistic, which is this one: 
+
+![Formula](formula.png)
+
+ANOVA tells us there are differences, but it does not ssay what the differences are for each pair of groups.   
+The effects of these pairwise comparisons of factor levels are sometimes called *simple effects*.   
+
+
+
+```{r}
+data <- CO2
+head(data)
+```
+##### Fixed factor vs Random factor
+Qualitative variables that:
+* Fixed factor: contains all the classes in reality, not only on the sample (for example gender is fixed if sample has M/F).   
+* Random factor: factor that does not contain all the real classes (levels). For example it includes a few types of plants. These are the plants of the sample, but not all plants in reality.     
+
+
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+
+## Worked Example   
+
+
+```{r}
+mod1<-lm(uptake~Treatment*conc,data=CO2)
+plot(mod1)
+```
+
+
+```{r}
+summary(mod1)
+```
+
+
+
+```{r}
+require(car)
+Anova(mod1) #We don't need th interaction
+```
+
+We check the ANOVA to decide whether to remove non-helpful vars, as these remove degrees of freedom and do not increase the perf. of the model.   
+
+Remove interaction.
+
+```{r}
+mod1.2<-mod1<-lm(uptake~Treatment+conc,data=CO2)
+par(mfrow=c(2,2))
+plot(mod1.2)
+```
+On the plot Residuals vc Fitted, the red line shall be as horizontal as possible , a sign of linear relationship.   
+
+Plot Scale-Location is good, as red line nearly flat.
+
+Overall the model looks very good.    
+
+
+
+```{r}
+summary(mod1.2)
+```
+
+
+
+```{r}
+Anova(mod1.2)
+```
+
+
+
+```{r}
+#Testing ssumptions
+vif(mod1.2)
+```
+Indicates how mch a var contributes to the model 
+vif should be < 4   
+Here vif is the lowest possible (1), so good. But his test does not make sense in this case because there is only one var.   
+
+
+```{r}
+shapiro.test(residuals(mod1.2))
+```
+We can assume normallity for the distrib of the residuals.   
+
+
+```{r}
+leveneTest(residuals(mod1.2)~CO2$Treatment)
+```
+assumptions are met. can proceed without transformation. IN this case the model was done previously.     
+
+in this case (because we only have two levels) we don't need pos-hoc tests because we know already that the two treatments are different.  
+
+But here we do it because normally we nee to do.   
+```{r}
+#Post-hoc
+require(multcomp)
+summary(glht(mod1.2,linfct=mcp(Treatment="Tukey")))
+```
+
+#### Adding Random Factors   
+
+```{r}
+#Adding random factors
+require(lme4)
+mod2<-lmer(uptake~Treatment+conc+(1|Type),data=CO2) #The Ecotype affecting the intercept
+mod3<-lmer(uptake~Treatment+conc+(1|Type/Plant),data=CO2) #Plant nested in Ecotype
+```
+
+
+```{r}
+#Model selection
+AIC(mod1.2,mod2,mod3) #mod2 is th best
+#Final model fit and Analysis of Deviance
+summary(mod2)
+```
+
+
+
+```{r}
+Anova(mod2)
+```
+
+#### Adding Random Factors    
+
+**Fixed factor:** includes all the variability that this factor can include. This happens when all factor levels that exist in nature are present in our sample.
+**Random factor:** does not include all the possible variability, only some. Typical random factors: locations from different regions. As these do not include all locations or Earth. Other examples are: Individuals; each individual fish would be a random factor. Since we measure each fish several times, there will be auto-correlation. Take into account auto-correlation of data.   
+We don't test hypothesis in random factors. we don't test for differences on random factors. (so no p value).    
+We pay attention to random factors because they cause auto-correlation.
+
+
+
+```{r}
+library(lme4)
+mod2<-lmer(uptake~Treatment+conc+(1|Type),data=CO2)
+```
+The '+' means that factors are additive, meaning that they do not interact among them.   
+The '|' means which part of the model is being affected by the random factor (on the left)   
+The '1' is the intercept.   
+
+This data set shows a *nested* or *hierarchical* design   
+```{r}
+mod3<-lmer(uptake~Treatment+conc+(1|Type/Plant),data=CO2)
+```
+The '/' means the nested of the vars. in this case *plant* is nested in *type*
+
+Which model is better?   
+```{r}
+AIC(mod1.2,mod2,mod3)
+```
+* df reflects the complexity of each model; lowest simpler (better).   
+* AIC, the lower the better????   
+Obvious choice is model 2.   
+By including one more parameter 
+model 3 is not better enough than model 2 to justify the inclusion of the new parameter.   
+```{r}
+summary(mod2)
+```
+
+
+```{r}
+Anova(mod2)
+```
+Deviance - not sum of squares- rather the *likelihood* (inverse of probability) of of the parameters of bneing significant in the model.    
+The concentration (var "conc") contributes more to explain the model twice as much as the var "treatment".    
+Deviance is the likelihood that a var influences the model.   
+
+
+# EXERCISES   
+
+## 1    
+With the data set “Cholesterol.csv”, perform a linear model with analysis of variance using the cholesterol in blood as dependent variable, Gender and Physical condition as independent categorical factors, and Age as covariate. Test the assumptions and formulate the model first considering the interactions and removing them if not significant.   
+
+```{r}
+data <- read.csv2("Cholesterol.csv", stringsAsFactors = TRUE)
+head(data)
+```
+```{r}
+str(data)
+```
+
+Are age and physical cond dependent on one another?     
+```{r}
+plot(data$Physical.condition, data$Age)
+```
+No.   
+
+```{r}
+model1 <- lm(data = data, Chol.Blood~Gender*Physical.condition*Age)
+```
+
+```{r}
+summary(model1)
+```
+
+
+```{r}
+plot(model1)
+```
+```{r}
+library(car)
+Anova(model1)
+```
+
+```{r}
+mod2<-lmer(uptake~Treatment+conc+(1|Type),data=CO2)
+```
+
+Var Hospital is nested in var Districts
+
+```{r}
+
+
+```
+
+## 2     
+Consider adding random factors to the model from those other variables present in the data set. Select the best model by AIC.   
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
