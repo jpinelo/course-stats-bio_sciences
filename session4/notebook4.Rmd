@@ -258,6 +258,7 @@ plot(model1)
 library(car)
 Anova(model1)
 ```
+The interactions are not significant.    
 
 ```{r}
 model1.2 <- lm(data = data, Chol.Blood~Gender+Physical.condition+Age)
@@ -270,7 +271,7 @@ summary(model1.2)
 ```{r}
 plot(model1.2)
 ```
-
+Leverage plot: when leverage is large might be worry but not when residuals are small. high leverage mean the value of the predisctors are larger than the other points.    
 
 
 
