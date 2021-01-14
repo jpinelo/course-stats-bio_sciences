@@ -150,6 +150,7 @@ transform then redo model
 
 ## NON-LINEAR REGRESSION
 
+#### Assumptions:     
 
 
 
@@ -157,86 +158,246 @@ transform then redo model
 
 
 
+![Hiperbolic.](hiperbolic.png)
 
 
+### Saturation constant   
+![Type IV.](type_IV.png)
+
+```{r}
+dat<-read.csv2("RotiferNR.csv",sep=";")
+head(dat)
+````
+```{r}
+plot(dat$FoodN,dat$rN,xlab="Food abundance",ylab="Daily growth rate",pch=19)
+````
+
+#### Non-linear sum of squares
+`nls()`    
+
+```{r}
+typ2<- nls(rN~(rmaxN*FoodN/(KfN+FoodN)),start=list(rmaxN=0.9,KfN=20000),data= dat)
+```
+rmax = max y (max growth rate)
+KfN = the value of x when y has half of the maximum of y (this can be approximate; in the order of magnitude of the value)
+     
+     
+```{r}
+summary(typ2)
+````
+Result means result not significant.   
 
 
-
-
-
-
-
-
-
+So try another model
+####     
+```{r}
+typ4<- nls(rN~(rmaxIVN*FoodN)/((FoodN+KfIVN)*(1+(iN*FoodN))),start=list(rmaxIVN=0.9,iN=0.000003769,KfIVN=2000),data=dat)
+```
+rmax = max y (max growth rate)
+KfIVN = the value of x when y has half of the maximum of y (this can be approximate; in the order of magnitude of the value)
+these values above should be the same as int he example above ty2
+iN = slope of the decrease of the down-slope of the curve
 
 
 
 ####     
 ```{r}
-
+summary(typ4)
 ````
+
+Results mean this model is good fit.   
+
+
+Good model:   
+* as simple as possible (less parameters);   
+* explains the variance as much of possible.   
+
+
+
+
+
+```{r}
+library(qpcR)
+```
+
+```{r}
+AICc(typ2)
+```
+
+```{r}
+AICc(typ4)
+```
+
+AIC - the lowest the better (including negative), so typ4 much better
+This AIC balances things out considering the number of parameters used. If use more parameters but results not much better, then AIC is higher.   
+It works similar to the Adjusted_R-squared       
+
+If we get a small difference between the IAC of two models, choose the simpler model.   
+If the values are similar, then can test for the significance of the difference.   
+There is only point in testing if the most complex has lower AIC, otherwise the choice is obviously the simpler model.   
+
+```{r}
+anova(typ2,typ4)
+````
+
+The values are indeed statistically significantly different.   
+We can only test this is the **models are nested**. Meaning that one model is a specific case of the other one. For example add another var to one model. The second model is a specific case of the first and they are nested.      
+
+####     
+```{r}
+typeII<-curve((1.97*(x-(-39)))/(974+x),from=0,to=800000)
+```
+
+####     
+```{r}
+typeIV<-curve((4.1*(x-(- 664)))/((31950+x)*(1+(0.00000254*x))),from=0,to=800000)
+```
+
+####     
+```{r}
+plot(dat$FoodN,dat$rN,xlab="Food abundance",ylab="Daily growth rate",pch=19)
+points(typeII,type="l",lty=2)
+points(typeIV,type="l")
+legend("bottomright",c("type II","type IV"),lty=c(2,1))
+```
+Residuals are not homogeneous.   
+How to justify lack of homogeinity. It is a technical problem. It comes from the fact that on data collection it is very difficualt to measure the aount of food, and we should take them as estimates. Furthermore, the slope is huge for small x, so it is too hard to know the exact y for eaaach x.   
+
+Here we could transform the var, but then we will not understand how the food intake affects the population.   
+So we could not interpret and use the results.   
+In general we do not transform variables in non-linear regressions.   
 
 ####     
 ```{r}
 
-````
+```
 
 ####     
 ```{r}
 
-````
+```
+complete...
+
+#### simulated annealing   
 
 ####     
 ```{r}
 
-````
-
-####     
-```{r}
-
-````
-
-####     
-```{r}
-
-````
+```
 
 
 
 
-## NON-PARAMETRIC REGRESSION
-The tern non-parametric is used differently then when used in the contsxt of testing for meand or variance
 
+## NON-PARAMETRIC REGRESSION OVERVIEW   
+The tern non-parametric is used differently then when used in the context of testing for meand or variance
+There are parameters, but they are tailored.   
 
+# EXERCISES   
 
+## 1
+
+With the data from the file “Data_exercise1.csv”, fit a simple linear regression model with lm(). Then check the residuals plot and plot the real data versus the fitted by the model.
+After you do all these things, the teacher will show you how to improve this fit with a non-linear regression model.
 
 
 ####     
 ```{r}
-
-````
-
-####     
-```{r}
-
-````
+data <- read.csv("Data_exercise1.csv")
+head(data)
+```
 
 ####     
 ```{r}
-
-````
-
-####     
-```{r}
-
-````
+str(data)
+```
 
 ####     
 ```{r}
-
-````
+model <- lm(Y~X, data = data)
+```
 
 ####     
 ```{r}
+summary(model)
+```
 
-````
+####     
+```{r}
+plot(model)
+```
+Conclusion model very bad...
+
+
+
+####     
+```{r}
+plot(data$X, data$Y)
+```
+As we can see above hte relationship is not linear, this is why the linear model did not work out well.   
+
+
+## 2   
+Fit a Monod model (you can google to find the equation) to the data from the file “Growth.csv”. Our dependent variable would be the growth rate.
+Plot the data and overlay the model fit Suggestion: functions nls() for the fit and curve() for overlaying the model fit in the plot.
+
+```{r}
+data1 <- read.csv("Growth.csv", dec = ",")
+data1
+```
+```{r}
+plot(data1$NO2, data1$r)
+```
+
+
+Dependent variable = y = r = Growth rate
+
+```{r}
+model2 <- nls(r ~ (rmax * NO2/(K + NO2)), start = list(rmax = 0.7, K = 5), data = data1)
+```
+
+```{r}
+summary(model2)
+```
+
+```{r}
+monod <- curve((0.68 * x)/(2.37 + x),from = 0, to = 350)
+plot(data1$NO2, data$r)
+points(monod, type = "l", lty = 2)
+```
+
+```{r}
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
