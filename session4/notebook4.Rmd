@@ -260,15 +260,52 @@ Anova(model1)
 ```
 
 ```{r}
-mod2<-lmer(uptake~Treatment+conc+(1|Type),data=CO2)
+model1.2 <- lm(data = data, Chol.Blood~Gender+Physical.condition+Age)
 ```
 
-Var Hospital is nested in var Districts
+```{r}
+summary(model1.2)
+```
+
+```{r}
+plot(model1.2)
+```
+
+
+
+
+
 
 ```{r}
 
 
 ```
+
+
+
+```{r}
+
+
+
+
+
+
+
+
+```{r}
+
+
+```
+
+
+
+
+Var Hospital is nested in var Districts
+
+
+
+
+
 
 ## 2     
 Consider adding random factors to the model from those other variables present in the data set. Select the best model by AIC.   
