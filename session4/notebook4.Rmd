@@ -242,6 +242,7 @@ plot(data$Physical.condition, data$Age)
 ```
 No.   
 
+#### Full factorial     
 ```{r}
 model1 <- lm(data = data, Chol.Blood~Gender*Physical.condition*Age)
 ```
@@ -291,25 +292,27 @@ this means that the distribution is normal (is not not normal)
 ```{r}
 leveneTest(data$Chol.Blood~data$Gender*data$Physical.condition)
 ```
+Assumption met.       
 The model meets all assumptions.     
 
-
-Var Hospital is nested in var Districts
-
+And model good, so can be used.   
 
 ## 2     
 Consider adding random factors to the model from those other variables present in the data set. Select the best model by AIC.   
 
+(similar ex. to CO2 ex on lecture)   
 
+Note that Var Hospital is nested in var Districts.   
 ```{r}
-
-
+library(lme4)
+model2 <- lmer(Chol.Blood ~ Gender + Physical.condition + (1 | Hospital), data = data)
+model3 <- lmer(Chol.Blood ~ Gender + Physical.condition + (1 | District), data = data)
 ```
 
 
-
+WHich model performs better?    
 ```{r}
-
+AIC(model1.2,model2,model3)
 
 ```
 
